@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en"
       xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4"
       xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8"/>
@@ -9,10 +10,15 @@
 </head>
 <body class="container">
 <h1>List of all bookmarks</h1>
-
+<div>
+    Hello <span sec:authentication="principal.username">Username</span>
+</div>
 <div style="text-align: right;margin-bottom: 1em;">
-    <a role="button" class="btn btn-primary" type="button"
-            th:href="@{/bookmark/}">Add Bookmark
+    <form th:action="@{/logout}" method="post" style="display: inline">
+        <button class="btn btn-danger" type="submit">Logout</button>
+    </form>
+    <a role="button" class="btn btn-primary" type="button" sec:authorize="hasRole('ADMIN')"
+       th:href="@{/bookmark/}">Add Bookmark
     </a>
 </div>
 
@@ -24,9 +30,10 @@
         <td><a th:text="${bookmark.url}" th:href="${bookmark.url}">bla</a></td>
         <td>
             <a class="btn btn-info" role="button"
-                    th:href="@{/bookmark/{id}(id=${bookmark.uuid})}">Details
+               th:href="@{/bookmark/{id}(id=${bookmark.uuid})}">Details
             </a>
-            <form th:action="@{/bookmark/{id}/delete(id=${bookmark.uuid})}" method="post" style="display: inline">
+            <form sec:authorize="hasRole('ADMIN')"
+                  th:action="@{/bookmark/{id}/delete(id=${bookmark.uuid})}" method="post" style="display: inline">
                 <button class="btn btn-danger" type="submit">Delete</button>
             </form>
         </td>

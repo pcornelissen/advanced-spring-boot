@@ -3,6 +3,7 @@ package com.packtpub.yummy.ui;
 import com.packtpub.yummy.model.Bookmark;
 import com.packtpub.yummy.service.BookmarkService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -15,6 +16,7 @@ import javax.validation.Valid;
 import java.util.UUID;
 
 @Controller
+@PreAuthorize("hasRole('USER')")
 @RequestMapping("/bookmark/")
 public class BookmarkUiController {
     @Autowired
@@ -26,6 +28,7 @@ public class BookmarkUiController {
         return "bookmark/details";
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping(value = "{id}", params = "edit=true")
     public String editForm(@PathVariable UUID id, Model model) {
         model.addAttribute("bookmark", bookmarkService.find(id));
@@ -33,6 +36,7 @@ public class BookmarkUiController {
         return "bookmark/edit";
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping()
     public String addForm(Model model) {
         model.addAttribute("bookmark", new Bookmark());
@@ -40,6 +44,7 @@ public class BookmarkUiController {
         return "bookmark/edit";
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("{id}")
     public String saveBookmark(@PathVariable UUID id, @Valid Bookmark bookmark,
                                BindingResult bindingResult, Model model
@@ -53,6 +58,7 @@ public class BookmarkUiController {
         return "redirect:/";
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public String addBookmark(@Valid Bookmark bookmark,
                               BindingResult bindingResult, Model model
@@ -65,6 +71,7 @@ public class BookmarkUiController {
         return "redirect:/";
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("{id}/delete")
     public String delete(@PathVariable UUID id) {
         bookmarkService.delete(id);

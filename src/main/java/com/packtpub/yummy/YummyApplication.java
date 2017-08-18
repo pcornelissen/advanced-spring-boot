@@ -26,6 +26,7 @@ public class YummyApplication {
         System.out.println("#######################");
         System.out.println("##### Initialized! ####");
         System.out.println("#######################");
+        System.out.println(" go to: http://localhost:8080");
     }
 
     @Configuration
