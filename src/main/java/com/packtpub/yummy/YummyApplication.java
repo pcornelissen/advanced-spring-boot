@@ -27,44 +27,11 @@ public class YummyApplication {
 
         ConfigurableApplicationContext context = SpringApplication.run(YummyApplication.class, args);
 
-        System.out.println("#######################");
-        System.out.println("##### WebBeans!    ####");
-        System.out.println("#######################");
-
-        String[] definitionNames = context.getBeanDefinitionNames();
-        Arrays.stream(definitionNames)
-                .filter(s -> context.getBean(s).getClass().getCanonicalName() != null)
-                .filter(s -> !context.getBean(s).getClass().getCanonicalName().contains(".autoconfigure."))
-                .filter(s -> context.getBean(s).getClass().getCanonicalName().contains(".web.")
-                        || context.getBean(s).getClass().getCanonicalName().contains("thymeleaf"))
-                .sorted(Comparator.comparing(o -> context.getBean(o).getClass().getCanonicalName()))
-                .forEachOrdered(s -> System.out.println("\nBean: " + s + "\n--\t"
-                        + clean(context.getBean(s).getClass().getCanonicalName())));
-        System.out.println("");
-        System.out.println("#################################");
-        System.out.println("##### Web Autoconfiguration! ####");
-        System.out.println("#################################");
-
-        definitionNames = context.getBeanDefinitionNames();
-        Arrays.stream(definitionNames)
-                .filter(s -> context.getBean(s).getClass().getCanonicalName() != null)
-                .filter(s -> context.getBean(s).getClass().getCanonicalName().contains(".autoconfigure."))
-                .filter(s -> context.getBean(s).getClass().getCanonicalName().contains(".web.")
-                        || context.getBean(s).getClass().getCanonicalName().contains("thymeleaf"))
-                .sorted(Comparator.comparing(o -> context.getBean(o).getClass().getCanonicalName()))
-                .forEachOrdered(s -> System.out.println("\nBean: " + s + "\n--\t"
-                        + clean(context.getBean(s).getClass().getCanonicalName())));
-
         System.out.println();
         System.out.println("#######################");
         System.out.println("##### Initialized! ####");
         System.out.println("#######################");
         System.out.println(" go to: http://localhost:8080");
-    }
-
-    private static String clean(String canonicalName) {
-        //get rid of CGLib garbage like $$EnhancerBySpringCGLIB$$cedd9792 in the classnames
-        return canonicalName.replaceAll("\\$\\$.*", "");
     }
 
     @Configuration
