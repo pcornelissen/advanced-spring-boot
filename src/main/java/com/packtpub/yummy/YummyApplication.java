@@ -69,10 +69,12 @@ public class YummyApplication {
 
     @Configuration
     public static class Cfg {
-        @Bean @Primary
+        @Bean
+        @Primary
         public ObjectMapper objectMapper(@Qualifier("_halObjectMapper") ObjectMapper objectMapper) {
             return objectMapper;
         }
+
         @Bean
         public HalObjectMapperConfigurer halObjectMapperConfigurer() {
             return new HalObjectMapperConfigurer();
