@@ -1,9 +1,12 @@
 package com.packtpub.yummy.config;
 
+import org.springframework.boot.devtools.remote.client.HttpHeaderInterceptor;
+import org.springframework.boot.web.client.RestTemplateCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.http.MediaType;
+import org.springframework.http.client.support.BasicAuthorizationInterceptor;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.xml.Jaxb2RootElementHttpMessageConverter;
 import org.springframework.web.servlet.LocaleResolver;
@@ -38,6 +41,14 @@ public class WebConfig extends WebMvcConfigurerAdapter {
         SessionLocaleResolver slr = new SessionLocaleResolver();
         slr.setDefaultLocale(Locale.GERMANY);
         return slr;
+    }
+
+    @Bean
+    public RestTemplateCustomizer restTemplateCustomizer(){
+        return restTemplate -> {
+            restTemplate.getInterceptors().add(new HttpHeaderInterceptor("foo","bar"));
+            restTemplate.getInterceptors().add(new BasicAuthorizationInterceptor("foo","bar"));
+        };
     }
 
 }
