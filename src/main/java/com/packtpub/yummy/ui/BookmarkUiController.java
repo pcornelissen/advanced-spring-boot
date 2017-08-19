@@ -7,12 +7,10 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.Optional;
 import java.util.UUID;
 
 @Controller
@@ -22,16 +20,21 @@ public class BookmarkUiController {
     @Autowired
     BookmarkService bookmarkService;
 
+    @ModelAttribute
+    public Bookmark bookmark(@PathVariable Optional<UUID> id){
+        return id
+                .map(uuid -> bookmarkService.find(uuid))
+                .orElseGet(Bookmark::new);
+    }
+
     @GetMapping("{id}")
     public String details(@PathVariable UUID id, Model model) {
-        model.addAttribute("bookmark", bookmarkService.find(id));
         return "bookmark/details";
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping(value = "{id}", params = "edit=true")
     public String editForm(@PathVariable UUID id, Model model) {
-        model.addAttribute("bookmark", bookmarkService.find(id));
         model.addAttribute("isEdit", true);
         return "bookmark/edit";
     }
@@ -39,7 +42,6 @@ public class BookmarkUiController {
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping()
     public String addForm(Model model) {
-        model.addAttribute("bookmark", new Bookmark());
         model.addAttribute("isEdit", false);
         return "bookmark/edit";
     }
