@@ -15,6 +15,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.hateoas.config.EnableHypermediaSupport;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
+import org.springframework.web.context.support.StandardServletEnvironment;
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -24,8 +25,11 @@ import java.util.Comparator;
 public class YummyApplication {
 
     public static void main(String[] args) {
-
-        ConfigurableApplicationContext context = SpringApplication.run(YummyApplication.class, args);
+        SpringApplication app = new SpringApplication(YummyApplication.class);
+        if(new StandardServletEnvironment().getActiveProfiles().length==0){
+            app.setAdditionalProfiles("dev", System.getProperty("user.name"));
+        }
+        ConfigurableApplicationContext context = app.run(args);
 
         System.out.println();
         System.out.println("#######################");
