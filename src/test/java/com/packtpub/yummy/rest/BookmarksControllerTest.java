@@ -14,6 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.hateoas.Resources;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -24,6 +25,7 @@ import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.never;
 import static org.mockito.internal.verification.VerificationModeFactory.atLeastOnce;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -32,6 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
+@WithMockUser(username = "admin", roles = {"ADMIN","USER"})
 public class BookmarksControllerTest {
     @Autowired
     MockMvc mvc;
@@ -41,24 +44,25 @@ public class BookmarksControllerTest {
     ObjectMapper mapper;
 
     @Before
-    public void setup(){
+    public void setup() {
         Mockito.reset(bookmarkService);
     }
 
     @Test
     public void addABookmark() throws Exception {
-        Bookmark value = new Bookmark("Packt publishing","http://packtpub.com");
+        Bookmark value = new Bookmark("Packt publishing", "http://packtpub.com");
         addBookmark(value);
         Mockito.verify(bookmarkService, atLeastOnce()).addBookmark(Mockito.any(Bookmark.class));
     }
 
     @Test
     public void addABookmarkFailsBecauseDescriptionIsNull() throws Exception {
-        Bookmark value = new Bookmark(null,"http://packtpub.com");
+        Bookmark value = new Bookmark(null, "http://packtpub.com");
         mvc.perform(
                 post("/bookmarks")
-                .contentType(MediaType.APPLICATION_JSON_UTF8)
-                .content(mapper.writeValueAsString(value))
+                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+                        .content(mapper.writeValueAsString(value))
+                        .with(csrf())
         ).andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$[0].field").value("description"));
@@ -67,11 +71,12 @@ public class BookmarksControllerTest {
 
     @Test
     public void addABookmarkFailsBecauseUrlIsNull() throws Exception {
-        Bookmark value = new Bookmark("testtest","broken://url.com");
+        Bookmark value = new Bookmark("testtest", "broken://url.com");
         mvc.perform(
                 post("/bookmarks")
-                .contentType(MediaType.APPLICATION_JSON_UTF8)
-                .content(mapper.writeValueAsString(value))
+                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+                        .content(mapper.writeValueAsString(value))
+                        .with(csrf())
         ).andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$[0].field").value("url"));
@@ -80,15 +85,16 @@ public class BookmarksControllerTest {
 
     @Test
     public void getAllBookmarks() throws Exception {
-        addBookmark(new Bookmark("Packt publishing","http://packtpub.com"));
-        addBookmark(new Bookmark("orchit GmbH homepage","http://orchit.de"));
+        addBookmark(new Bookmark("Packt publishing", "http://packtpub.com"));
+        addBookmark(new Bookmark("orchit GmbH homepage", "http://orchit.de"));
 
         String result = mvc.perform(
                 MockMvcRequestBuilders.get("/bookmarks")
-                        .accept("application/hal+json;charset=UTF-8","application/json;charset=UTF-8")
+                        .accept("application/hal+json;charset=UTF-8", "application/json;charset=UTF-8")
         ).andDo(print())
                 .andReturn().getResponse().getContentAsString();
-        Resources<Bookmark> output = mapper.readValue(result, new TypeReference<Resources<Bookmark>>(){});
+        Resources<Bookmark> output = mapper.readValue(result, new TypeReference<Resources<Bookmark>>() {
+        });
 
         assertThat(output.getContent().size(), is(greaterThanOrEqualTo(2)));
         assertTrue(output.getContent().stream()
@@ -98,11 +104,13 @@ public class BookmarksControllerTest {
                 .anyMatch(bookmark ->
                         bookmark.getUrl().equals("http://packtpub.com")));
     }
+
     private void addBookmark(Bookmark value) throws Exception {
         mvc.perform(
                 post("/bookmarks")
-                .contentType(MediaType.APPLICATION_JSON_UTF8)
-                .content(mapper.writeValueAsString(value))
+                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+                        .content(mapper.writeValueAsString(value))
+                        .with(csrf())
         ).andExpect(status().isCreated());
     }
 }

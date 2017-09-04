@@ -15,8 +15,14 @@ public class DataInitialization implements ApplicationListener<ContextRefreshedE
     @Autowired
     BookmarkService bookmarkService;
 
+    private static volatile boolean initialized = false;
+
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
+        //It may happen that this is executed more than once
+        if (initialized) return;
+        initialized = true;
+
         bookmarkService.addBookmark(new Bookmark("Packt publishing", "http://packtpub.com"));
         bookmarkService.addBookmark(new Bookmark("orchit GmbH", "http://orchit.de"));
     }

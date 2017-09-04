@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.hateoas.Resource;
+import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -25,6 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
+@WithMockUser(username = "user", roles = "USER")
 public class ServiceDocumentControllerTest {
     @Autowired
     MockMvc mvc;
@@ -41,11 +44,12 @@ public class ServiceDocumentControllerTest {
                         .contentTypeCompatibleWith("application/hal+json;charset=UTF-8"))
                 .andReturn().getResponse().getContentAsString();
 
-        Resource<String> value = mapper.readValue(result, new TypeReference<Resource<String>>(){});
+        Resource<String> value = mapper.readValue(result, new TypeReference<Resource<String>>() {
+        });
 
         List<String> linkRels = value.getLinks().stream().map(link -> link.getRel()).collect(Collectors.toList());
         assertThat(linkRels, Matchers.hasItem("self"));
-        assertEquals(value.getLink("self"),value.getId());
+        assertEquals(value.getLink("self"), value.getId());
 
         assertTrue(value.hasLink("bookmarks"));
     }

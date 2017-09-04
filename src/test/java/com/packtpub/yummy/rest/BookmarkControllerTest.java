@@ -14,6 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.hateoas.Resource;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,7 +24,7 @@ import java.util.UUID;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.never;
-import static org.mockito.internal.verification.VerificationModeFactory.atLeastOnce;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -33,6 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
+@WithMockUser(username = "admin", roles = {"ADMIN","USER"})
 public class BookmarkControllerTest {
     @Autowired
     MockMvc mvc;
@@ -63,6 +65,7 @@ public class BookmarkControllerTest {
 
         mvc.perform(
                 delete(location).accept("application/hal+json;charset=UTF-8", "application/json;charset=UTF-8")
+                .with(csrf())
         ).andDo(print()).andExpect(status().isGone());
 
         mvc.perform(
@@ -77,10 +80,12 @@ public class BookmarkControllerTest {
 
         mvc.perform(
                 delete(location).accept("application/hal+json;charset=UTF-8", "application/json;charset=UTF-8")
+                        .with(csrf())
         ).andDo(print()).andExpect(status().isGone());
 
         mvc.perform(
                 delete(location).accept("application/hal+json;charset=UTF-8", "application/json;charset=UTF-8")
+                        .with(csrf())
         ).andDo(print()).andExpect(status().isNotModified());
     }
 
@@ -96,6 +101,7 @@ public class BookmarkControllerTest {
                         .contentType(MediaType.APPLICATION_JSON_UTF8)
                         .accept("application/hal+json;charset=UTF-8", "application/json;charset=UTF-8")
                         .content(mapper.writeValueAsString(output.getContent().withUrl("http://kulinariweb.de")))
+                        .with(csrf())
         ).andDo(print()).andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
         output = mapper.readValue(result, new TypeReference<Resource<Bookmark>>() {
@@ -116,6 +122,7 @@ public class BookmarkControllerTest {
                         .contentType(MediaType.APPLICATION_JSON_UTF8)
                         .accept("application/hal+json;charset=UTF-8", "application/json;charset=UTF-8")
                         .content(mapper.writeValueAsString(output.getContent()))
+                        .with(csrf())
         ).andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$[0].field").value("description"));
@@ -135,6 +142,7 @@ public class BookmarkControllerTest {
                         .contentType(MediaType.APPLICATION_JSON_UTF8)
                         .accept("application/hal+json;charset=UTF-8", "application/json;charset=UTF-8")
                         .content(mapper.writeValueAsString(output.getContent()))
+                        .with(csrf())
         ).andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$[0].field").value("url"));
@@ -153,6 +161,7 @@ public class BookmarkControllerTest {
                         .contentType(MediaType.APPLICATION_JSON_UTF8)
                         .accept("application/hal+json;charset=UTF-8", "application/json;charset=UTF-8")
                         .content(mapper.writeValueAsString(output.getContent().withUrl("http://kulinariweb.de")))
+                        .with(csrf())
         ).andDo(print()).andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
 
@@ -161,6 +170,7 @@ public class BookmarkControllerTest {
                         .contentType(MediaType.APPLICATION_JSON_UTF8)
                         .accept("application/hal+json;charset=UTF-8", "application/json;charset=UTF-8")
                         .content(mapper.writeValueAsString(output.getContent().withUrl("http://kulinariweb2.de")))
+                        .with(csrf())
         ).andDo(print()).andExpect(status().isConflict());
     }
 
@@ -173,6 +183,7 @@ public class BookmarkControllerTest {
                         .contentType(MediaType.APPLICATION_JSON_UTF8)
                         .accept("application/hal+json;charset=UTF-8", "application/json;charset=UTF-8")
                         .content(mapper.writeValueAsString(input))
+                        .with(csrf())
         )
                 .andDo(print())
                 .andExpect(status().isNotFound());
@@ -197,6 +208,7 @@ public class BookmarkControllerTest {
                 post("/bookmarks")
                         .contentType(MediaType.APPLICATION_JSON_UTF8)
                         .content(mapper.writeValueAsString(input))
+                        .with(csrf())
         ).andDo(print()).andExpect(status().isCreated())
                 .andReturn().getResponse().getHeader("Location");
     }
