@@ -1,5 +1,6 @@
 package com.packtpub.yummy.config;
 
+import com.packtpub.yummy.service.MyUserDetailsService;
 import com.packtpub.yummy.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -8,9 +9,9 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder;
 
 import javax.sql.DataSource;
 
@@ -19,6 +20,8 @@ import javax.sql.DataSource;
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     UserService userService;
+    @Autowired
+    UserDetailsService userDetailsService;
     @Autowired
     private DataSource datasource;
 
@@ -41,8 +44,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder builder) throws Exception {
-        builder.userDetailsService(
-                username -> userService.findUserByUsername(username)
-        );
+        builder.userDetailsService(userDetailsService);
     }
+
 }
