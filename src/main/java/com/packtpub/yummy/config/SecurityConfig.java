@@ -1,5 +1,6 @@
 package com.packtpub.yummy.config;
 
+import com.packtpub.yummy.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,6 +17,8 @@ import javax.sql.DataSource;
 @Configuration
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
+    @Autowired
+    UserService userService;
     @Autowired
     private DataSource datasource;
 
@@ -38,9 +41,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder builder) throws Exception {
-        builder.jdbcAuthentication()
-        .usersByUsernameQuery("select username, password, enabled from users where username=?")
-        .authoritiesByUsernameQuery("select username, role as authority from user_roles where username=?")
-        .dataSource(datasource);
+        builder.userDetailsService(
+                username -> userService.findUserByUsername(username)
+        );
     }
 }
