@@ -13,8 +13,10 @@ import java.util.List;
 @Data @NoArgsConstructor @AllArgsConstructor @Builder
 public class MyUser implements UserDetails{
 
+    @Builder.Default
     List<GrantedAuthority> authorities = new ArrayList<>();
     String username, password;
+    @Builder.Default
     boolean enabled=true;
 
     /**
