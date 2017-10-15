@@ -40,21 +40,6 @@ public class DataInitializationJpa implements ApplicationListener<ContextRefresh
         Employee e3 = new Employee(null, "Oliver S.", "Berlin", 10000, subsidiary);
         em.persist(e3);
 
-        System.out.println("STARTING EMPLOYEE LIST");
-        for (Employee employee : repo.findAll()) {
-            System.out.println("  " + employee.toString());
-        }
-        for (Employee employee : repo.findAll()) {
-            System.out.println("  " + employee.toString());
-        }
-        System.out.println("ENDING   EMPLOYEE LIST");
-        for (Employee employee : repo.findEmployeesByNameOrIncome("John Wayne",2000)) {
-            System.out.println("  " + employee.toString());
-        }
-        repo.removeByIncomeGreaterThan(5000);
-        for (Employee employee : repo.findAll()) {
-            System.out.println("R  " + employee.toString());
-        }
     }
 
 }
