@@ -1,5 +1,6 @@
 package com.packtpub.yummy.ui;
 
+import com.packtpub.yummy.aspects.LogExecution;
 import com.packtpub.yummy.service.BookmarkService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -14,7 +15,7 @@ public class BookmarksUiController {
     @Autowired
     BookmarkService bookmarkService;
 
-    @GetMapping
+    @GetMapping @LogExecution
     @PreAuthorize("isAuthenticated()")
     public String listOfBookmarks(Model model){
         model.addAttribute("bookmarks", bookmarkService.findAll());
