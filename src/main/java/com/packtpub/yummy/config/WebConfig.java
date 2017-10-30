@@ -1,9 +1,6 @@
 package com.packtpub.yummy.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.packtpub.yummy.springdata.AccessLogRepository;
-import com.packtpub.yummy.springdata.MyInterceptor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
@@ -16,7 +13,6 @@ import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.xml.Jaxb2RootElementHttpMessageConverter;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
-import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
@@ -27,8 +23,6 @@ import java.util.Locale;
 
 @Configuration
 public class WebConfig extends WebMvcConfigurerAdapter {
-    @Autowired
-    AccessLogRepository accessLogRepository;
 
 
     @Override
@@ -47,17 +41,6 @@ public class WebConfig extends WebMvcConfigurerAdapter {
         configurer.defaultContentType(MediaType.APPLICATION_JSON_UTF8);
     }
 
-    /**
-     * {@inheritDoc}
-     * <p>This implementation is empty.
-     *
-     * @param registry
-     */
-    @Override
-    public void addInterceptors(InterceptorRegistry registry) {
-        registry.addWebRequestInterceptor(new MyInterceptor(accessLogRepository))
-                .excludePathPatterns("/webjars");
-    }
 
     @Bean
     public LocaleResolver localeResolver(){
