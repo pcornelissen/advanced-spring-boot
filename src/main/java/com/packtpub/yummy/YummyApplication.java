@@ -18,9 +18,6 @@ import org.springframework.hateoas.config.EnableHypermediaSupport;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.web.context.support.StandardServletEnvironment;
 
-import java.util.Arrays;
-import java.util.Comparator;
-
 @SpringBootApplication
 @EnableJpaRepositories
 @EnableHypermediaSupport(type = EnableHypermediaSupport.HypermediaType.HAL)
