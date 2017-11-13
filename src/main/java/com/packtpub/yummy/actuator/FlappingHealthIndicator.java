@@ -28,9 +28,10 @@ public class FlappingHealthIndicator extends AbstractHealthIndicator {
             builder.down(new RuntimeException("Bad Day"));
         else if (seconds < 20)
             builder.outOfService();
-        else if (seconds < 25)
-            builder.status("Custom");
-        else {
+        else if (seconds < 25) {
+            builder.status("DOWN");
+            builder.withDetail("custom", "!");
+        }else {
             builder.unknown();
             builder.withException(new RuntimeException("Bad Mood"));
         }
